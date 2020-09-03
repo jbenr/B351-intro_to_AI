@@ -17,8 +17,13 @@ import math
 # (1) Write a recursive function to compute the nth fibonacci number
 
 def fib(n):
-    raise NotImplementedError
+    if n == 1:
+        return 0
+    elif n == 2:
+        return 1
+    else: return fib(n-1) + fib(n-2)
 
+print(fib(15))
 
 
 #################################
