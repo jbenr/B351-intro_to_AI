@@ -87,15 +87,14 @@ def recSumNodes(root):
 
 def iterSumNodes(root):
     current = [root]
-    nodeList = []
+    lst = []
     while current:
-        next_level = []
+        ondeck = []
         for n in current:
-            nodeList.append(n.value)
-            next_level.extend(n.subnodes)
-        current = next_level
-    return sum(nodeList)
-
+            lst.append(n.value)
+            ondeck.extend(n.subnodes)
+        current = ondeck
+    return sum(lst)
 
 
 
@@ -119,14 +118,11 @@ def compose(f_outer, f_inner):
 #     For example, yieldTwice([1, 2, 3]) => 1, 1, 2, 2, 3, 3
 
 def yieldTwice(iterable):
-    raise NotImplementedError
-#    n = 0
-#    while (n <= len(iterable)):
-#        yield(iterable)
-#        yield(iterable)
-#        n = 1+n
-
-
+    n = 0
+    while (n < len(iterable)):
+        yield iterable[n]
+        yield iterable[n]
+        n = 1+n
 
 
 
@@ -153,9 +149,11 @@ def toHex(value, minbytes=0, maxbytes=-1):
 #     For example, yieldAllValid([255, 16, 'foo', 3], toHex) => 'ff', '10', '3'
 
 def yieldAllValid(iterable, function):
-    raise NotImplementedError
-
-
+    for n in iterable:
+        try:
+            yield function(iterable[n])
+        except:
+            pass
 
 
 
@@ -166,7 +164,16 @@ def yieldAllValid(iterable, function):
 # (1) Create a string which has each level of the tree on a new line
 
 def treeToString(root):
-    raise NotImplementedError
+    if root.value == []:
+        return
+    elif root.subnodes == []:
+        return str(root.value)
+    else:
+        if len(root.subnodes) == 2:
+            return str(root.value) + '\n' + treeToString(root.subnodes[0]) + treeToString(root.subnodes[1])
+        else: 
+            return str(root.value) + '\n' + treeToString(root.subnodes[0])
+
 
 
 if __name__ == '__main__':
