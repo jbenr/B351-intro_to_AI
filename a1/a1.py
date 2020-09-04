@@ -122,7 +122,7 @@ def yieldTwice(iterable):
     for n in iterable:
         yield next(i)
         yield n
-        if n == len(iterable):
+        if n == len(list(iterable)):
             raise StopIteration()
     
     #i = 0
