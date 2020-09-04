@@ -17,13 +17,14 @@ import math
 # (1) Write a recursive function to compute the nth fibonacci number
 
 def fib(n):
-    if n == 1:
+    if n == 0:
         return 0
-    elif n == 2:
+    elif n == 1:
         return 1
     else: return fib(n-1) + fib(n-2)
 
 print(fib(15))
+
 
 
 #################################
@@ -33,8 +34,12 @@ print(fib(15))
 # (1) Write a function which returns a tuple of the first and last items in a given sequence
 
 def firstLast(seq):
-    raise NotImplementedError
-
+    if len(seq) == 0:
+        return 
+    elif len(seq) == 1:
+        return seq[0]
+    else:
+        return seq[0],seq[len(seq)-1]
 
 
 
@@ -52,6 +57,7 @@ class Node:
 exampleTree = Node(1,[Node(2,[]),Node(3,[Node(4,[Node(5,[]),Node(6,[Node(7,[])])])])])
 
 
+
 #################################
 # Problem 3
 #################################
@@ -60,10 +66,16 @@ exampleTree = Node(1,[Node(2,[]),Node(3,[Node(4,[Node(5,[]),Node(6,[Node(7,[])])
 # (1) Write a function to calculate the sum of every node in a tree (recursively)
 
 def recSumNodes(root):
-    raise NotImplementedError
-
-
-
+    if root.value == []:
+        return 0
+    elif root.subnodes == []:
+        return root.value
+    else:
+        if len(root.subnodes) == 2:
+            return root.value + recSumNodes(root.subnodes[0]) + recSumNodes(root.subnodes[1])
+        else: 
+            return root.value + recSumNodes(root.subnodes[0])
+        
 
 
 #################################
@@ -74,8 +86,15 @@ def recSumNodes(root):
 # (1) Write a function to calculate the sum of every node in a tree (iteratively)
 
 def iterSumNodes(root):
-    raise NotImplementedError
-
+    current = [root]
+    nodeList = []
+    while current:
+        next_level = []
+        for n in current:
+            nodeList.append(n.value)
+            next_level.extend(n.subnodes)
+        current = next_level
+    return sum(nodeList)
 
 
 
@@ -88,9 +107,7 @@ def iterSumNodes(root):
 # and returns a new function applying the inner then the outer function to a value
 
 def compose(f_outer, f_inner):
-    raise NotImplementedError
-
-
+    return lambda x: f_outer(f_inner(x))
 
 
 
@@ -103,6 +120,11 @@ def compose(f_outer, f_inner):
 
 def yieldTwice(iterable):
     raise NotImplementedError
+#    n = 0
+#    while (n <= len(iterable)):
+#        yield(iterable)
+#        yield(iterable)
+#        n = 1+n
 
 
 
