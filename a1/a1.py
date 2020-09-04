@@ -118,14 +118,17 @@ def compose(f_outer, f_inner):
 #     For example, yieldTwice([1, 2, 3]) => 1, 1, 2, 2, 3, 3
 
 def yieldTwice(iterable):
-    i = 0
-    l = len(list(iterable))
-    while i < l:
-        yield list(iterable)[i]
-        yield list(iterable)[i]
-        if i == l:
-            break
-        i += 1
+    i = iter(iterable)
+    for n in iterable:
+        yield next(i)
+        yield n
+    
+    #i = 0
+    #l = len(list(iterable))
+    #while i < l:
+    #    yield list(iterable)[i]
+    #    yield list(iterable)[i]
+    #    i += 1
 
 
 
