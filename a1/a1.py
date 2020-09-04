@@ -119,7 +119,8 @@ def compose(f_outer, f_inner):
 
 def yieldTwice(iterable):
     i = 0
-    while i < len(iterable):
+    l = len(iterable)
+    while i < l:
         yield iterable[i]
         yield iterable[i]
         i += 1
