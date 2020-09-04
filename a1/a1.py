@@ -121,8 +121,8 @@ def yieldTwice(iterable):
     i = 0
     l = len(list(iterable))
     while i < l:
-        yield iterable[i]
-        yield iterable[i]
+        yield list(iterable)[i]
+        yield list(iterable)[i]
         i += 1
 
 
