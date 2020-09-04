@@ -123,6 +123,8 @@ def yieldTwice(iterable):
     while i < l:
         yield list(iterable)[i]
         yield list(iterable)[i]
+        if i == l:
+            break
         i += 1
 
 
