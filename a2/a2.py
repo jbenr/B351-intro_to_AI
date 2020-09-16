@@ -129,35 +129,35 @@ class Board():
     # returns True if the space is empty and on the board,
     # and assigning value to it if not blocked by any constraints
     def isValidMove(self, space, value):
+        spaces = (space[0] <= self.n2) & (space[1] <= self.n2)
         col = value not in self.valsInCols[space[1]]
         row = value not in self.valsInRows[space[0]]
         box = value not in self.valsInBoxes[self.spaceToBox(space[0], space[1])]
         unsolved = space in self.unsolvedSpaces
-        spaceQ = space not in self.board
-        return unsolved and box and row and col and spaceQ
+        return unsolved and box and row and col and spaces
 
     # optional helper function for use by getMostConstrainedUnsolvedSpace
     def evaluateSpace(self, space):
-        val = 0
-        val = len(self.valsInBoxes[self.spaceToBox(space[0], space[1])])
-        val = val + len(self.valsInCols[space[1]])
-        val = val + len(self.valsInRows[space[0]])
-        return val
+        doms = 0
+        for i in range(1, self.n2+1):
+            if self.isValidMove(space, i):
+                doms += 1
+        return doms
 
     # gets the unsolved space with the most current constraints
     # returns None if unsolvedSpaces is empty
     def getMostConstrainedUnsolvedSpace(self):
-        if len(self.unsolvedSpaces) == 0:
-            return None
+        if len(self.unsolvedSpaces) > 0:
+            move = None
+            num = self.n2
+            for space in self.unsolvedSpaces:
+                nums = self.evaluateSpace(space)
+                if nums < num:
+                    move = space
+                    num = nums
+            return move
         else:
-            unSolveLst = iter(self.unsolvedSpaces)
-            theSpace = self.unsolvedSpaces.pop()
-            self.unsolvedSpaces.add(theSpace)
-            for val in self.unsolvedSpaces:
-                newSpace = next(unSolveLst)
-                if self.evaluateSpace(theSpace) < self.evaluateSpace(newSpace):
-                    theSpace = newSpace
-            return theSpace
+            return None
 
 
 class Solver:
@@ -179,41 +179,6 @@ class Solver:
 
     # returns True if a solution exists and False if one does not
     def solveBoard(self, board):
-        #if len(board.unsolvedSpaces) == 0:
-        #    return True
-        #else:
-        #    while len(board.unsolvedSpaces) != 0:
-        #        move = board.getMostConstrainedUnsolvedSpace()
-        #        moves = []
-        #        values = []
-        #        for n in range(1,10):
-        #            if board.isValidMove(move, n):
-        #                board.makeMove(move, n)
-        #                moves.append(move)
-        #                values.append(n)
-        #            elif not board.isValidMove(move, n):
-        #                for num in moves:
-        #                    board.undoMove(moves[num], values[num])
-
-        #if not board.unsolvedSpaces:
-        #    return board
-        #else:
-        #    move = board.getMostConstrainedUnsolvedSpace()
-        #    moves = []
-        #    for i in range(1,9):
-        #        if board.isValidMove(move, i):
-        #            moves.append(i)
-        #        elif not moves:
-        #            return False
-        #        for m in moves:
-        #            board.makeMove(move, m)
-        #            moves.remove(m)
-        #        if not board.unsolvedSpaces:
-        #            return True
-        #    finalM = [move, moves[0]]
-        #print(finalM)
-        #board.print(board)
-
         move = board.getMostConstrainedUnsolvedSpace()
         if len(board.unsolvedSpaces) == 0:
             return True
@@ -232,5 +197,5 @@ if __name__ == "__main__":
     # change this to the input file that you'd like to test
     board = Board('/Users/benjamin/school/B351/distribution/a2/tests/example.csv')
     s = Solver()
-    s.solveBoard(board)
+    print(s.solveBoard(board))
     board.print()
