@@ -133,7 +133,8 @@ class Board():
         row = value not in self.valsInRows[space[0]]
         box = value not in self.valsInBoxes[self.spaceToBox(space[0], space[1])]
         unsolved = space in self.unsolvedSpaces
-        return unsolved and box and row and col
+        spaceQ = space not in self.board
+        return unsolved and box and row and col and spaceQ
 
     # optional helper function for use by getMostConstrainedUnsolvedSpace
     def evaluateSpace(self, space):
@@ -233,5 +234,3 @@ if __name__ == "__main__":
     s = Solver()
     s.solveBoard(board)
     board.print()
-
-    booty
