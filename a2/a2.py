@@ -129,7 +129,7 @@ class Board():
     # returns True if the space is empty and on the board,
     # and assigning value to it if not blocked by any constraints
     def isValidMove(self, space, value):
-        spaces = (space[0] <= self.n2) & (space[1] <= self.n2)
+        spaces = (space[0] <= self.n2) & (space[0] >= 0) & (space[1] <= self.n2) & (space[1] >= 0)
         col = value not in self.valsInCols[space[1]]
         row = value not in self.valsInRows[space[0]]
         box = value not in self.valsInBoxes[self.spaceToBox(space[0], space[1])]
@@ -191,7 +191,6 @@ class Solver:
                     board.undoMove(move, i)
             return False
             
-
 
 if __name__ == "__main__":
     # change this to the input file that you'd like to test
