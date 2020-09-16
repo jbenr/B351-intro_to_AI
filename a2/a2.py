@@ -114,7 +114,7 @@ class Board():
     def makeMove(self, space, value):
         self.valsInRows[space[0]].add(value)
         self.valsInCols[space[1]].add(value)
-        self.valsInBoxes[board.spaceToBox(space[0], space[1])].add(space)
+        self.valsInBoxes[self.spaceToBox(space[0], space[1])].add(space)
         self.unsolvedSpaces.remove(space)
 
     # removes the move, its record in its row, col, and box, and adds the space back to unsolvedSpaces
