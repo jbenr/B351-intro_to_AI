@@ -112,6 +112,7 @@ class Board():
 
     # makes a move, records it in its row, col, and box, and removes the space from unsolvedSpaces
     def makeMove(self, space, value):
+        self.board[space] = value
         self.valsInRows[space[0]].add(value)
         self.valsInCols[space[1]].add(value)
         self.valsInBoxes[self.spaceToBox(space[0], space[1])].add(value)
@@ -119,6 +120,7 @@ class Board():
 
     # removes the move, its record in its row, col, and box, and adds the space back to unsolvedSpaces
     def undoMove(self, space, value):
+        del self.board[space]
         self.valsInRows[space[0]].remove(value)
         self.valsInCols[space[1]].remove(value)
         self.valsInBoxes[self.spaceToBox(space[0], space[1])].remove(value)
@@ -231,3 +233,5 @@ if __name__ == "__main__":
     s = Solver()
     s.solveBoard(board)
     board.print()
+
+    booty
