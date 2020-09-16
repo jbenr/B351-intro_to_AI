@@ -121,7 +121,7 @@ class Board():
     def undoMove(self, space, value):
         self.valsInRows[space[0]].remove(value)
         self.valsInCols[space[1]].remove(value)
-        self.valsInBoxes[self.spaceToBox(space[0], space[1])].remove(space)
+        self.valsInBoxes[self.spaceToBox(space[0], space[1])].remove(value)
         self.unsolvedSpaces.add(space)
 
     # returns True if the space is empty and on the board,
