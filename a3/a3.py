@@ -64,7 +64,7 @@ def expand_fringe(current_state, fringe):
 #     See the project documentation for more details.
 
 def breadth_first_search(fringe, max_depth, goal_board):
-    if fringe is None:
+    if len(fringe) < 1:
         return STOP
     else:
         b = fringe[0].board
