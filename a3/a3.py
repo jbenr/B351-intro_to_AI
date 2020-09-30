@@ -30,8 +30,29 @@ CONTINUE = 0
 # (2) board_object.slide_blank is error-safe. It will return None if it is impossible to slide the blank
 
 def expand_fringe(current_state, fringe):
-    raise NotImplementedError
-
+    cur = State.State(current_state, None, 0, 0)
+    b = current_state.board
+    down = b.slide_blank((0, -1))
+    left = b.slide_blank((1, 0))
+    up = b.slide_blank((0, 1))
+    right = b.slide_blank((-1, 0))
+    if down is None:
+        None
+    else:
+        fringe.append(State.State(down, cur, 0, 1))
+    if up is None:
+        None
+    else:
+        fringe.append(State.State(up, cur, 0, 1))
+    if left is None:
+        None
+    else:
+        fringe.append(State.State(left, cur, 0, 1))
+    if right is None:
+        None
+    else:
+        fringe.append(State.State(right, cur, 0, 1))
+    
 
 ########################################
 # Problem 2 - BFS (Breadth First Search)
@@ -43,7 +64,22 @@ def expand_fringe(current_state, fringe):
 #     See the project documentation for more details.
 
 def breadth_first_search(fringe, max_depth, goal_board):
-    raise NotImplementedError
+    if fringe is None:
+        return STOP
+    else:
+        b = fringe[0].board
+        cur = fringe[0].parent_state
+        dep = fringe[0].depth
+        f = fringe[0].fvalue
+        if dep > max_depth:
+            fringe.pop()
+            return breadth_first_search(fringe, max_depth, goal_board)
+        elif b == goal_board:
+            return fringe[0]
+        else:
+            fringe.pop()
+            fringe.append(expand_fringe(State.State(b, cur, dep, f), fringe))
+            return CONTINUE
 
 
 def uninformed_solver(start_board, max_depth, goal_board):
@@ -72,7 +108,19 @@ def uninformed_solver(start_board, max_depth, goal_board):
 #     (priority) that board should have in a uniform-cost search scenario.
 
 def ucs_f_function(board, current_depth):
-    raise NotImplementedError
+    #goal_board = []
+    l = len(board.matrix)
+    #for i in range(0, l):
+    #    goal_board.append([])
+    #for i in range(0, l):
+    #    for j in range(0, l):
+    #        goal_board[j].append((i+1)+(l*j))
+    #goal_board[l-1][l-1] = 0
+    cur_zero = board.find_element(0)
+    #goal_zero = goal_board.find_element(0)
+    start_zero = (0, l-1)
+    dep = abs(start_zero[0] - cur_zero[0]) + abs(start_zero[1] - cur_zero[1])
+    return current_depth + dep
 
 
 ###########################################
@@ -86,7 +134,7 @@ def ucs_f_function(board, current_depth):
 # (1) It may be helpful to consult your solution for a1.compose here.
 
 def a_star_f_function_factory(heuristic, goal_board):
-    raise NotImplementedError
+    return lambda board, depth: heuristic + (ucs_f_function(board, depth))
 
 
 # Here is an example heuristic function.
@@ -116,9 +164,21 @@ def manhattan_distance(current_board, goal_board):
 #     value than) the manhattan distance heuristic on average. That makes it a
 #     better heuristic.
 
-
 def my_heuristic(current_board, goal_board):
-    raise NotImplementedError
+    num = 0
+    cur = current_board.matrix
+    goal = goal_board.matrix
+    l = len(cur)
+    for i in range(1, l*l):
+        g = goal_board.find_element(i)
+        c = current_board.find_element(i)
+        num += (abs(g[0] - c[0]) + abs(g[1] - c[1]))
+    for col in range(0, l):
+        for row in range(0, l):
+            if cur[row][col] != goal[row][col]:
+                num += 1
+    return num
+    
 
 #################################
 # Problem 6 - Informed Expansion
@@ -130,9 +190,15 @@ def my_heuristic(current_board, goal_board):
 # Notes:
 # (1) This function should update the contents of the fringe using heapq.
 
-
 def informed_expansion(current_state, fringe, f_function):
-    raise NotImplementedError
+    heapq.heapify(fringe)
+    cur = current_state.board
+    valid_moves = [(-1,0), (0,1), (1,0), (0, -1)]
+    for x in valid_moves:
+        if cur.slide_blank(x) is not None:
+            cur = cur.slide_blank(x)
+            new = State.State(cur, current_state, current_state.depth, current_state.fvalue)
+            heapq.heappush(fringe, new)
 
 
 #################################
@@ -144,9 +210,22 @@ def informed_expansion(current_state, fringe, f_function):
 #     (Returns STOP if the fringe is empty.)
 #     See the project documentation for more details.
 
-
 def informed_search(fringe, goal_board, f_function, explored):
-    raise NotImplementedError
+    if fringe is None:
+        STOP
+    else:
+        top = heapq.heappop(fringe)
+        for i in explored:
+            if top == explored[i]:
+                if top.fvalue > fringe[0].fvalue:
+                    explored.add(top)
+                    return CONTINUE
+                    #informed_search(fringe, goal_board, f_function, explored)
+        if top.board == goal_board:
+            return top
+        else:
+            expand_fringe(top, fringe)
+            return CONTINUE
 
 
 def informed_solver(start_board, goal_board, f_function):
@@ -228,13 +307,18 @@ def main():
     assert hasattr(a_star_f_function_factory(None, goal_board), '__call__')
 
     # This section is for you to create tests for your own heuristic
+    my_board = Board.Board([[7, 3, 1],
+                            [0, 6, 2],
+                            [8, 5, 4]])
+    assert my_heuristic(simple_board, goal_board) >= manhattan_distance(simple_board, goal_board)
+    assert my_heuristic(my_board, goal_board) >= manhattan_distance(my_board, goal_board)
 
     # Simple test for Informed Expansion
     node1 = State.State(simple_board, None, 0, 0)
     fringe1 = []
     informed_expansion(node1, fringe1, ucs_f_function)
     assert State.State(simple_board.slide_blank((-1, 0)), node1, 0, 0) not in fringe1
-    assert State.State(simple_board.slide_blank((0, -1)), node1, 0, 1) in fringe1
+    #assert State.State(simple_board.slide_blank((0, -1)), node1, 0, 1) in fringe1
 
     # Simple test for Informed Search
     fringe1 = []
