@@ -134,7 +134,7 @@ def ucs_f_function(board, current_depth):
 # (1) It may be helpful to consult your solution for a1.compose here.
 
 def a_star_f_function_factory(heuristic, goal_board):
-    return lambda board, depth: heuristic + (ucs_f_function(board, depth))
+    return lambda heuristic, current_board: heuristic(current_board, goal_board)
 
 
 # Here is an example heuristic function.
@@ -194,10 +194,10 @@ def informed_expansion(current_state, fringe, f_function):
     heapq.heapify(fringe)
     cur = current_state.board
     valid_moves = [(-1,0), (0,1), (1,0), (0, -1)]
-    for x in valid_moves:
-        if cur.slide_blank(x) is not None:
-            cur = cur.slide_blank(x)
-            new = State.State(cur, current_state, current_state.depth, current_state.fvalue)
+    for x in range(0, len(valid_moves)):
+        if cur.slide_blank(valid_moves[x]) is not None:
+            cur = cur.slide_blank(valid_moves[x])
+            new = State.State(cur, current_state, current_state.depth, current_state.fvalue+1)
             heapq.heappush(fringe, new)
 
 
