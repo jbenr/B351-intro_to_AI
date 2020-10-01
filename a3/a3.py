@@ -34,7 +34,7 @@ def expand_fringe(current_state, fringe):
     valid_moves = [(1,0), (0,1), (-1,0), (0,-1)]
     for move in valid_moves:
         if b.slide_blank(move) is not None:
-            fringe.append(State.State(b.slide_blank(move), current_state, current_state.depth, 1))
+            fringe.append(State.State(b.slide_blank(move), current_state, current_state.depth+1, 1))
     
 
 ########################################
@@ -143,16 +143,37 @@ def manhattan_distance(current_board, goal_board):
 #     value than) the manhattan distance heuristic on average. That makes it a
 #     better heuristic.
 
+def my_helper(current_board, goal_board, val):
+    num = 0
+    g = goal_board.find_element(val)
+    c = current_board.find_element(val)
+    num += (abs(g[0] - c[0]) + abs(g[1] - c[1]))
+    return num
+
+def lin_conflicts(board, goal_board):
+    num = 0
+    m = board.matrix
+    g = goal_board.matrix
+    l = len(m[0])
+    for r in range(l):
+        for v in range(l):
+            if m[r][v] in g[r]:
+                for i in range(l-v):
+                    if (m[r][v+i] in g[r]) and (m[r][v] != g[r][v]) and (m[r][v+i] != g[r][v+i]):
+                        num += 2
+    return num/3
+
+def transpose(board):
+    m = board.matrix
+    width = len(m)
+    return [[m[j][i] for j in range(width)] for i in range(width)]
+
 def my_heuristic(current_board, goal_board):
     num = 0
-    cur = current_board.matrix
-    goal = goal_board.matrix
-    l = len(cur)
-    for i in range(1, l*l):
-        g = goal_board.find_element(i)
-        c = current_board.find_element(i)
-        num += (abs(g[0] - c[0]) + abs(g[1] - c[1]))
-    return num
+    l = len(current_board.matrix)
+    for i in range((l*l)-1):
+        num = num + my_helper(current_board, goal_board, i+1)
+    return num + lin_conflicts(current_board, goal_board)
     
 
 #################################
@@ -168,11 +189,11 @@ def my_heuristic(current_board, goal_board):
 def informed_expansion(current_state, fringe, f_function):
     heapq.heapify(fringe)
     valid_moves = [(-1,0), (0,1), (1,0), (0, -1)]
-    cur = current_state.board
     for move in valid_moves:
+        cur = current_state.board
         if cur.slide_blank(move) is not None:
             cur = cur.slide_blank(move)
-            new = State.State(cur, current_state, current_state.depth, f_function(cur, current_state.depth+1))
+            new = State.State(cur, current_state, current_state.depth+1, f_function(cur, current_state.depth))
             heapq.heappush(fringe, new)
 
 
@@ -190,10 +211,11 @@ def informed_search(fringe, goal_board, f_function, explored):
         return STOP
     top = heapq.heappop(fringe)
     for i in explored:
-        if top == explored[i]:
-            if top.fvalue > fringe[0].fvalue:
-                explored.add(top)
+        if top.board == explored[i].board:
+            if top.fvalue > explored[i].fvalue:
                 return CONTINUE
+            else:
+                explored.add(top)
     if top.board == goal_board:
         return top
     else:
@@ -263,6 +285,7 @@ def main():
     assert State.State(simple_board.slide_blank((-1, 0)), node1, 0, 0) not in fringe1
     assert State.State(simple_board.slide_blank((0, -1)), node1, 0, 1) in fringe1
 
+
     # Simple test case for breadth_first_search
     fringe1 = []
     node1 = State.State(simple_board, None, 0, 0)
@@ -280,18 +303,41 @@ def main():
     assert hasattr(a_star_f_function_factory(None, goal_board), '__call__')
 
     # This section is for you to create tests for your own heuristic
+    boardNT = Board.Board([[1, 2, 3],
+                           [4, 5, 6],
+                           [7, 8, 0]])
+    boardT = Board.Board([[1, 4, 7],
+                         [2, 5, 8],
+                         [3, 6, 0]])
+    boardLin = Board.Board([[3, 2, 1],
+                            [4, 5, 6],
+                            [7, 8, 0]])
+    boardTest = Board.Board([[1, 2, 3],
+                            [4, 8, 6],
+                            [7, 5, 0]])                        
+    assert Board.Board(transpose(boardNT)) == boardT
+    assert lin_conflicts(boardNT, goal_board) == 0
+    assert lin_conflicts(boardLin, goal_board) == 2
+
     my_board = Board.Board([[7, 3, 1],
                             [0, 6, 2],
                             [8, 5, 4]])
+    assert my_helper(my_board, goal_board, 1) == 2
+    assert my_helper(my_board, goal_board, 0) == 3
+    
     assert my_heuristic(simple_board, goal_board) >= manhattan_distance(simple_board, goal_board)
     assert my_heuristic(my_board, goal_board) >= manhattan_distance(my_board, goal_board)
+    assert my_heuristic(boardTest, goal_board) <= 2
+
+    assert my_helper(my_board, goal_board, 1) == 2
+    assert my_helper(my_board, goal_board, 0) == 3
 
     # Simple test for Informed Expansion
     node1 = State.State(simple_board, None, 0, 0)
     fringe1 = []
     informed_expansion(node1, fringe1, ucs_f_function)
     assert State.State(simple_board.slide_blank((-1, 0)), node1, 0, 0) not in fringe1
-    #assert State.State(simple_board.slide_blank((0, -1)), node1, 0, 1) in fringe1
+    assert State.State(simple_board.slide_blank((0, -1)), node1, 0, 1) in fringe1
 
     # Simple test for Informed Search
     fringe1 = []
@@ -352,7 +398,7 @@ def main():
     fringe1 = []
     informed_expansion(node1, fringe1, ucs_f_function)
     assert State.State(simple_board.slide_blank((-1, 0)), node1, 0, 0) not in fringe1
-    #assert State.State(simple_board.slide_blank((0, -1)), node1, 0, 1) in fringe1
+    assert State.State(simple_board.slide_blank((0, -1)), node1, 0, 1) in fringe1
 
     # Simple test for Informed Search
     fringe1 = []
