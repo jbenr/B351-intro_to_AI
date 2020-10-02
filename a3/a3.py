@@ -218,8 +218,8 @@ def informed_search(fringe, goal_board, f_function, explored):
         return STOP
     top = heapq.heappop(fringe)
     for i in explored:
-        if top.board == explored.values()[i]:
-            if top.fvalue > explored.keys()[i]:
+        if top.board in explored.values():
+            if top.fvalue > explored.keys(top.board):
                 return CONTINUE
             else:
                 explored[top.fvalue] = top.board
