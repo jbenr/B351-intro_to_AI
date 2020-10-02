@@ -156,17 +156,24 @@ def lin_conflicts(board, goal_board):
     g = goal_board.matrix
     l = len(m[0])
     for r in range(l):
-        for v in range(l):
-            if m[r][v] in g[r]:
-                for i in range(l-v):
-                    if (m[r][v+i] in g[r]) and (m[r][v] != g[r][v]) and (m[r][v+i] != g[r][v+i]):
-                        num += 2
-    return num/3
+        if 0 not in m[r]:
+            for v in range(l):
+                if m[r][v] in g[r]:
+                    for i in range(l-v):
+                        if (m[r][v+i] in g[r]) and (m[r][v] != g[r][v]) and (m[r][v+i] != g[r][v+i]) and (m[r][v] != 0) and (m[r][v+i] != 0):
+                            num += 2
+                            break
+                        break
+                    break
+    t_board = transpose(board)
+    t_gbaord = transpose(goal_board)
+    return num
 
 def transpose(board):
     m = board.matrix
     width = len(m)
-    return [[m[j][i] for j in range(width)] for i in range(width)]
+    b = [[m[j][i] for j in range(width)] for i in range(width)]
+    return b
 
 def my_heuristic(current_board, goal_board):
     num = 0
@@ -211,11 +218,11 @@ def informed_search(fringe, goal_board, f_function, explored):
         return STOP
     top = heapq.heappop(fringe)
     for i in explored:
-        if top.board == explored[i].board:
-            if top.fvalue > explored[i].fvalue:
+        if top.board == explored.values()[i]:
+            if top.fvalue > explored.keys()[i]:
                 return CONTINUE
             else:
-                explored.add(top)
+                explored[top.fvalue] = top.board
     if top.board == goal_board:
         return top
     else:
@@ -314,7 +321,7 @@ def main():
                             [7, 8, 0]])
     boardTest = Board.Board([[1, 2, 3],
                             [4, 8, 6],
-                            [7, 5, 0]])                        
+                            [7, 5, 0]])
     assert Board.Board(transpose(boardNT)) == boardT
     assert lin_conflicts(boardNT, goal_board) == 0
     assert lin_conflicts(boardLin, goal_board) == 2
@@ -328,6 +335,10 @@ def main():
     assert my_heuristic(simple_board, goal_board) >= manhattan_distance(simple_board, goal_board)
     assert my_heuristic(my_board, goal_board) >= manhattan_distance(my_board, goal_board)
     assert my_heuristic(boardTest, goal_board) <= 2
+    boardTest2 = Board.Board([[1, 2, 3],
+                              [4, 5, 6],
+                              [7, 0, 8]])
+    assert my_heuristic(boardTest2, goal_board) <= 1
 
     assert my_helper(my_board, goal_board, 1) == 2
     assert my_helper(my_board, goal_board, 0) == 3
