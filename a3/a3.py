@@ -169,17 +169,21 @@ def lin_conflicts(board, goal_board):
     t_gbaord = transpose(goal_board)
     return num
 
-#def lin_conflicts2(board, goal_board):
-#    num = 0
-#    m = board.matrix
-#    g = goal_board.matrix
-#    l = len(m[0])
-#    for r in range(l):
-#        vals = []
-#        for v in range(l):
-#            if (m[r][v] in g[r]):
-#                vals.append(m[r][v])
-#        if
+def lin_conflicts2(board, goal_board):
+    num = 0
+    m = board.matrix
+    g = goal_board.matrix
+    l = len(m[0])
+    for r in range(l):
+        vals = []
+        for v in range(l):
+            if (m[r][v] in g[r]):
+                vals.append(m[r][v])
+        if (len(vals) == l) and 0 not in vals:
+            for j in range(l):
+                if m[r][j] != g[r][j]:
+                    num += 1
+    return num
 
 def transpose(board):
     m = board.matrix
@@ -192,7 +196,7 @@ def my_heuristic(current_board, goal_board):
     l = len(current_board.matrix)
     for i in range((l*l)-1):
         num = num + my_helper(current_board, goal_board, i+1)
-    return num + lin_conflicts(current_board, goal_board)
+    return num + lin_conflicts2(current_board, goal_board)
     
 
 #################################
@@ -229,11 +233,10 @@ def informed_search(fringe, goal_board, f_function, explored):
     if not fringe:
         return STOP
     top = heapq.heappop(fringe)
-    if top.board in explored.keys():
-        if top.fvalue >= explored[top.board]:
-            return CONTINUE
-        else:
-            explored[top.board] = top.fvalue
+    if (top.board in explored.keys()) and (top.fvalue >= explored[top.board]):
+        return CONTINUE
+    else:
+        explored[top.board] = top.fvalue
     if top.board == goal_board:
         return top
     else:
@@ -340,7 +343,7 @@ def main():
     boardGrader = Board.Board([[1, 2, 3],
                                [0, 5, 6],
                                [4, 7, 8]])
-    assert lin_conflicts(boardGrader, goal_board) == 0
+    assert lin_conflicts2(boardGrader, goal_board) == 0
 
     my_board = Board.Board([[7, 3, 1],
                             [0, 6, 2],
@@ -374,6 +377,9 @@ def main():
     assert informed_search(fringe1, goal_board, ucs_f_function, explored) == CONTINUE
     fringe1[0] = State.State(goal_board, node1, 0, 0)
     assert type(informed_search(fringe1, goal_board, ucs_f_function, explored)) is State.State
+    informed_expansion(node1, fringe1, ucs_f_function)
+    informed_search(fringe1, goal_board, ucs_f_function, explored)
+    assert len(explored) == 2
 
     # Simple test for IDS
     node1 = State.State(simple_board, None, 0, 0)
