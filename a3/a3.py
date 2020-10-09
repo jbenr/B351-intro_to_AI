@@ -169,6 +169,18 @@ def lin_conflicts(board, goal_board):
     t_gbaord = transpose(goal_board)
     return num
 
+#def lin_conflicts2(board, goal_board):
+#    num = 0
+#    m = board.matrix
+#    g = goal_board.matrix
+#    l = len(m[0])
+#    for r in range(l):
+#        vals = []
+#        for v in range(l):
+#            if (m[r][v] in g[r]):
+#                vals.append(m[r][v])
+#        if
+
 def transpose(board):
     m = board.matrix
     width = len(m)
@@ -200,7 +212,7 @@ def informed_expansion(current_state, fringe, f_function):
         cur = current_state.board
         if cur.slide_blank(move) is not None:
             cur = cur.slide_blank(move)
-            new = State.State(cur, current_state, current_state.depth+1, f_function(cur, current_state.depth))
+            new = State.State(cur, current_state, current_state.depth+1, f_function(cur, current_state.depth+1))
             heapq.heappush(fringe, new)
 
 
@@ -217,12 +229,11 @@ def informed_search(fringe, goal_board, f_function, explored):
     if not fringe:
         return STOP
     top = heapq.heappop(fringe)
-    for i in explored:
-        if top.board in explored.values():
-            if top.fvalue > explored.keys(top.board):
-                return CONTINUE
-            else:
-                explored[top.fvalue] = top.board
+    if top.board in explored.keys():
+        if top.fvalue >= explored[top.board]:
+            return CONTINUE
+        else:
+            explored[top.board] = top.fvalue
     if top.board == goal_board:
         return top
     else:
@@ -325,6 +336,11 @@ def main():
     assert Board.Board(transpose(boardNT)) == boardT
     assert lin_conflicts(boardNT, goal_board) == 0
     assert lin_conflicts(boardLin, goal_board) == 2
+
+    boardGrader = Board.Board([[1, 2, 3],
+                               [0, 5, 6],
+                               [4, 7, 8]])
+    assert lin_conflicts(boardGrader, goal_board) == 0
 
     my_board = Board.Board([[7, 3, 1],
                             [0, 6, 2],
