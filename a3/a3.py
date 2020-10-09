@@ -181,15 +181,6 @@ def lin_conflicts2(board, goal_board):
             for j in range(l):
                 if m[r][j] != g[r][j]:
                     num += 1
-    for r in range(l):
-        vals = []
-        for v in range(l):
-            if (m[v][r] in g[r]):
-                vals.append(m[v][r])
-        if (len(vals) == l) and 0 not in vals:
-            for j in range(l):
-                if m[j][r] != g[j][r]:
-                    num += 1
     return num
 
 #def transpose(board):
@@ -351,6 +342,10 @@ def main():
                                [0, 5, 6],
                                [4, 7, 8]])
     assert lin_conflicts2(boardGrader, goal_board) == 0
+    board_A = Board.Board([[1, 2, 3],
+                            [7, 5, 6],
+                            [4, 8, 0]])
+    assert lin_conflicts2(board_A, goal_board) == 0
 
     my_board = Board.Board([[7, 3, 1],
                             [0, 6, 2],
