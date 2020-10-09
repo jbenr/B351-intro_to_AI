@@ -165,8 +165,6 @@ def lin_conflicts(board, goal_board):
                             break
                         break
                     break
-    t_board = transpose(board)
-    t_gbaord = transpose(goal_board)
     return num
 
 def lin_conflicts2(board, goal_board):
@@ -183,10 +181,19 @@ def lin_conflicts2(board, goal_board):
             for j in range(l):
                 if m[r][j] != g[r][j]:
                     num += 1
+    for r in range(l):
+        vals = []
+        for v in range(l):
+            if (m[v][r] in g[r]):
+                vals.append(m[v][r])
+        if (len(vals) == l) and 0 not in vals:
+            for j in range(l):
+                if m[j][r] != g[j][r]:
+                    num += 1
     return num
 
-def transpose(board):
-    m = board.matrix
+#def transpose(board):
+    m = board
     width = len(m)
     b = [[m[j][i] for j in range(width)] for i in range(width)]
     return b
@@ -336,7 +343,7 @@ def main():
     boardTest = Board.Board([[1, 2, 3],
                             [4, 8, 6],
                             [7, 5, 0]])
-    assert Board.Board(transpose(boardNT)) == boardT
+    #assert Board.Board(transpose(boardNT)) == boardT
     assert lin_conflicts(boardNT, goal_board) == 0
     assert lin_conflicts(boardLin, goal_board) == 2
 
