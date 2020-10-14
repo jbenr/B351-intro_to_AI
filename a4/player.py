@@ -114,12 +114,14 @@ class PlayerMM(BasePlayer):
         move = 0
 
         if board.game_over:
-            winner = board.winner
-            if winner == 0:
-                score = MaxVal
+            if board.winner == 0:
+                score = board.p1_pot
+                self.P1_WIN_SCORE = score
+                return None, self.P1_WIN_SCORE
             else:
-                score = MinVal
-            return None, score
+                score = board.p2_pot
+                self.P2_WIN_SCORE = score
+                return None, self.P2_WIN_SCORE
 
         if depth == 0 and (board.game_over == False):
             return None, self.heuristic(board)
@@ -167,10 +169,13 @@ class PlayerAB(BasePlayer):
         if board.game_over:
             winner = board.winner
             if winner == 0:
-                score = alpha
+                score = board.p1_pot
+                self.P1_WIN_SCORE = score
+                return None, self.P1_WIN_SCORE
             else:
-                score = beta
-            return None, score
+                score = board.p2_pot
+                self.P2_WIN_SCORE = score
+                return None, self.P2_WIN_SCORE
 
         if depth == 0 and (board.game_over == False):
             return None, self.heuristic(board)
@@ -185,7 +190,7 @@ class PlayerAB(BasePlayer):
                         MaxVal = val
                         max_move = i
                         alpha = max(alpha, MaxVal)
-                        if beta < alpha:
+                        if beta <= alpha:
                             return None, MaxVal
                 return max_move, MaxVal
             else:
@@ -197,7 +202,7 @@ class PlayerAB(BasePlayer):
                         MinVal = val
                         min_move = i
                         beta = min(beta, MinVal)
-                        if beta < alpha:
+                        if beta <= alpha:
                             return None, MinVal
                 return min_move, MinVal
 
