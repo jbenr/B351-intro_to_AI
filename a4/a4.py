@@ -33,10 +33,9 @@ class Game:
                 move = self.player2.findMove(board.trace)
 
             # makes the move
-            print('--------------------')
-            print(move)
             board.makeMove(move)
             board.print()
+            print('--------------------')
 
         # determines if the game is over or not
         if board.winner == -1:
@@ -56,10 +55,10 @@ if __name__ == "__main__":
     # Create player one by calling the
     # player class corresponding to the
     # search algorithm the player uses.
-    p1 = PlayerAB(6)
+    p1 = PlayerMM(3)
 
     # Same for player 2
-    p2 = RemotePlayer(6)
+    p2 = RemotePlayer(3)
 
     # Create the game instance using the
     # board and players you've made.

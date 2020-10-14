@@ -182,8 +182,11 @@ class PlayerAB(BasePlayer):
                     board.undoMove()
                     if val > MaxVal:
                         MaxVal = val
-                        move = i
-                return move, MaxVal
+                        max_move = i
+                        alpha = max(alpha, MaxVal)
+                        if beta < alpha:
+                            return None, MaxVal
+                return max_move, MaxVal
             else:
                 for i in moves:
                     board.makeMove(i)
@@ -191,8 +194,11 @@ class PlayerAB(BasePlayer):
                     board.undoMove()
                     if val < MinVal:
                         MinVal = val
-                        move = i
-                return move, MinVal
+                        min_move = i
+                        beta = min(beta, MinVal)
+                        if beta < alpha:
+                            return None, MinVal
+                return min_move, MinVal
 
     def findMove(self, trace):
         board = Board(trace)
@@ -212,7 +218,11 @@ class PlayerDP(PlayerAB):
     # if a saved heuristic value exists in self.resolved for board.state, returns that value
     # otherwise, uses BasePlayer.heuristic to get a heuristic value and saves it under board.state
     def heuristic(self, board):
-        raise NotImplementedError
+        if board.state in self.resolved:
+            return self.resolved.get(board.state)
+        else:
+            self.resolved.update({board.state: BasePlayer.heuristic(self, board)})
+            return BasePlayer.heuristic(self, board)
 
 #######################################################
 ###########Example Subclass for Testing
