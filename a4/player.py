@@ -222,8 +222,8 @@ class PlayerDP(PlayerAB):
         if board.state in self.resolved:
             return self.resolved.get(board.state)
         else:
-            self.resolved.update({board.state: self.heuristic(board)})
-            return BasePlayer.heuristic(self, board)
+            self.resolved.update({board.state: BasePlayer.heuristic(self, board)})
+            return self.heuristic(board)
 
 #######################################################
 ###########Example Subclass for Testing
