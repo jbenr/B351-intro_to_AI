@@ -109,22 +109,22 @@ class PlayerMM(BasePlayer):
     # performs minimax on board with depth.
     # returns the best move and best score as a tuple
     def minimax(self, board, depth):
+        MaxVal = -self.P1_WIN_SCORE
+        MinVal = -self.P2_WIN_SCORE
+        move = 0
+
         if board.game_over:
             winner = board.winner
             if winner == 0:
-                score = board.p1_pot
+                score = MaxVal
             else:
-                score = board.p2_pot
+                score = MinVal
             return None, score
-
-        MaxVal = -self.P1_WIN_SCORE
-        MinVal = -self.P2_WIN_SCORE
-        move = None
-        moves = board.getAllValidMoves()
 
         if depth == 0 and (board.game_over == False):
             return None, self.heuristic(board)
         else:
+            moves = board.getAllValidMoves()
             if board.turn == 0:
                 for i in moves: 
                     board.makeMove(i)
@@ -159,22 +159,23 @@ class PlayerAB(BasePlayer):
     # in a cutoff situation, return the score that resulted in the cutoff
     # returns the best move and best score as a tuple
     def alphaBeta(self, board, depth, alpha, beta):
+        MaxVal = -self.P1_WIN_SCORE
+        MinVal = -self.P2_WIN_SCORE
+        max_move = 0
+        min_move = 0
+
         if board.game_over:
             winner = board.winner
             if winner == 0:
-                score = board.p1_pot
+                score = alpha
             else:
-                score = board.p2_pot
+                score = beta
             return None, score
-
-        MaxVal = -self.P1_WIN_SCORE
-        MinVal = -self.P2_WIN_SCORE
-        move = None
-        moves = board.getAllValidMoves()
 
         if depth == 0 and (board.game_over == False):
             return None, self.heuristic(board)
         else:
+            moves = board.getAllValidMoves()
             if board.turn == 0:
                 for i in moves: 
                     board.makeMove(i)
@@ -221,7 +222,7 @@ class PlayerDP(PlayerAB):
         if board.state in self.resolved:
             return self.resolved.get(board.state)
         else:
-            self.resolved.update({board.state: BasePlayer.heuristic(self, board)})
+            self.resolved.update({board.state: self.heuristic(board)})
             return BasePlayer.heuristic(self, board)
 
 #######################################################
