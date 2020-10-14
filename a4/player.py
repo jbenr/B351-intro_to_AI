@@ -20,15 +20,34 @@ class BasePlayer:
     # Assign integer scores to the three terminal states
     # P2_WIN_SCORE < TIE_SCORE < P1_WIN_SCORE
     # Access these with "self.TIE_SCORE", etc.
-    P1_WIN_SCORE = NotImplemented
-    P2_WIN_SCORE = NotImplemented
-    TIE_SCORE =  NotImplemented
+    P1_WIN_SCORE = 1000000
+    P2_WIN_SCORE = -1000000
+    TIE_SCORE =  0
     # Returns a heuristic for the board position
     # Good positions for 0 pieces should be positive and
     # good positions for 1 pieces should be negative
     # for all boards, P2_WIN_SCORE < heuristic(b) < P1_WIN_SCORE
     def heuristic(self, board):
-        raise NotImplementedError
+        score = board.p1_pot - board.p2_pot
+        for i in range(0,5):
+            if board.p1_pits[i] == 0:
+                for j in range(0,i):
+                    if board.p1_pits[j] == (i-j):
+                        score += board.p2_pits[5-i]
+            if board.p2_pits[i] == 0:
+                for j in range(0,i):
+                    if board.p2_pits[j] == (i-j):
+                        score -= board.p1_pits[5-i]
+
+            if board.p1_pits[i] == 6-i:
+                score += 1
+            if board.p2_pits[i] == 6-i:
+                score -= 1
+
+            if (6-i) > board.p1_pits[i]:
+                score += board.p1_pits[i] - (6-i)
+
+        return score
 
     # You are not expected to implement anything here.
     def findMove(self, trace):
@@ -90,7 +109,40 @@ class PlayerMM(BasePlayer):
     # performs minimax on board with depth.
     # returns the best move and best score as a tuple
     def minimax(self, board, depth):
-        raise NotImplementedError
+        if board.game_over:
+            winner = board.winner
+            if winner == 0:
+                score = board.p1_pot
+            else:
+                score = board.p2_pot
+            return None, score
+
+        MaxVal = -self.P1_WIN_SCORE
+        MinVal = -self.P2_WIN_SCORE
+        move = None
+        moves = board.getAllValidMoves()
+
+        if depth == 0 and (board.game_over == False):
+            return None, self.heuristic(board)
+        else:
+            if board.turn == 0:
+                for i in moves: 
+                    board.makeMove(i)
+                    val = self.minimax(board, depth-1)[1]
+                    board.undoMove()
+                    if val > MaxVal:
+                        MaxVal = val
+                        move = i
+                return move, MaxVal
+            else:
+                for i in moves:
+                    board.makeMove(i)
+                    val = self.minimax(board, depth-1)[1]
+                    board.undoMove()
+                    if val < MinVal:
+                        MinVal = val
+                        move = i
+                return move, MinVal
 
     def findMove(self, trace):
         board = Board(trace)
@@ -107,7 +159,40 @@ class PlayerAB(BasePlayer):
     # in a cutoff situation, return the score that resulted in the cutoff
     # returns the best move and best score as a tuple
     def alphaBeta(self, board, depth, alpha, beta):
-        raise NotImplementedError
+        if board.game_over:
+            winner = board.winner
+            if winner == 0:
+                score = board.p1_pot
+            else:
+                score = board.p2_pot
+            return None, score
+
+        MaxVal = -self.P1_WIN_SCORE
+        MinVal = -self.P2_WIN_SCORE
+        move = None
+        moves = board.getAllValidMoves()
+
+        if depth == 0 and (board.game_over == False):
+            return None, self.heuristic(board)
+        else:
+            if board.turn == 0:
+                for i in moves: 
+                    board.makeMove(i)
+                    val = self.alphaBeta(board, depth-1, MaxVal, MinVal)[1]
+                    board.undoMove()
+                    if val > MaxVal:
+                        MaxVal = val
+                        move = i
+                return move, MaxVal
+            else:
+                for i in moves:
+                    board.makeMove(i)
+                    val = self.alphaBeta(board, depth-1, MaxVal, MinVal)[1]
+                    board.undoMove()
+                    if val < MinVal:
+                        MinVal = val
+                        move = i
+                return move, MinVal
 
     def findMove(self, trace):
         board = Board(trace)

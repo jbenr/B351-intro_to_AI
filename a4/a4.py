@@ -33,6 +33,8 @@ class Game:
                 move = self.player2.findMove(board.trace)
 
             # makes the move
+            print('--------------------')
+            print(move)
             board.makeMove(move)
             board.print()
 
@@ -54,13 +56,14 @@ if __name__ == "__main__":
     # Create player one by calling the
     # player class corresponding to the
     # search algorithm the player uses.
-    p1 = RemotePlayer(3)
+    p1 = PlayerAB(6)
 
     # Same for player 2
-    p2 = ManualPlayer()
+    p2 = RemotePlayer(6)
 
     # Create the game instance using the
     # board and players you've made.
+    #trace = '123551234220105241'
     g = Game(trace, p1, p2)
 
     g.runGame()
