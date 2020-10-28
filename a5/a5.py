@@ -5,6 +5,8 @@
 # Do not share these assignments or their solutions outside of this class.
 
 import math
+import heapq
+import numpy
 
 # unique takes an iterable and returns
 # - a set of each unique item from that iterable
@@ -136,15 +138,15 @@ class Node:
     # a point is a dictionary of each attribute for the point mapped to the attribute's value
 
     def classify_point(self, point):
-        if self is not None:
+        if self.classification is not None:
             return self.classification
         else:
-            val = self.attribute.get(point)
+            val = point.get(self.attribute)
             if val in self.children:
-                chi = self.child.get(point)
+                chi = self.children.get(val)
             else:
-                chi = OTHER
-            classify_point(chi, point)
+                chi = self.children.get(OTHER)
+            return chi.classify_point(point)
 
     ##################################################
 
@@ -224,14 +226,30 @@ class KNN_Classifier:
     ##################################################
     # Objective: Return the euclidean distance distance between two points
     def calc_euclidean_distance(self, point_a, point_b):
-        raise NotImplementedError
+        # x = point_a
+        # y = point_b
+        # distance = math.sqrt(sum([(a - b) ** 2 for a, b in zip(x, y)]))
+        # return distance
+        a = sum(point_a)
+        b = sum(point_b)
+        nump = a - b
+        nump = nump ** 2
+        return numpy.sum(math.sqrt(nump))
 
     ##################################################
     # Problem 3b - Pick Label
     ##################################################
     # Objective: Choose the most frequent label out of the labels for the k nearest neighbors
     def get_top_label(self, top_k_labels):
-        raise NotImplementedError
+        # count = 0
+        # m_freq = top_k_labels[0]
+        # for i in top_k_labels:
+        #     freq = top_k_labels.count(i)
+        #     if freq > count:
+        #         count = freq
+        #         m_freq = i
+        # return m_freq
+        return max(set(top_k_labels), key = top_k_labels.count)
 
     ##################################################
     # Problem 3c- Classify
@@ -240,6 +258,16 @@ class KNN_Classifier:
     #
     # Notes:
     #  - sample points and sample_labels correspond with each other
-    #  - you may find heappush/pop to be useful to keep track of the k closet neighbors here
+    #  - you may find heappush/pop to be useful to keep track of the k closest neighbors here
     def classify_point(self, point, training_points, training_labels):
-        raise NotImplementedError
+        close = []
+        for t_point, label in zip(training_points, training_labels):
+            dist = self.calc_euclidean_distance(point, t_point)
+            heapq.heappush(close, (dist, label))
+        k_close_p = []
+        for i in range(0, self.k):
+            k_close_p.append(heapq.heappop(close))
+        k_close_l = []
+        for i in k_close_p:
+            k_close_l.append(point[1])
+        return self.get_top_label(k_close_l)
