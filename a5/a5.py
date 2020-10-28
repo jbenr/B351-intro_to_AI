@@ -226,9 +226,7 @@ class KNN_Classifier:
     ##################################################
     # Objective: Return the euclidean distance distance between two points
     def calc_euclidean_distance(self, point_a, point_b):
-        x = point_a
-        y = point_b
-        distance = math.sqrt(sum([(a - b) ** 2 for a, b in zip(x, y)]))
+        distance = math.sqrt(sum([(p_a - p_b) ** 2 for p_a, p_b in zip(point_a, point_b)]))
         return distance
         # a = sum(point_a)
         # b = sum(point_b)
