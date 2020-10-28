@@ -267,5 +267,5 @@ class KNN_Classifier:
             k_close_p.append(heapq.heappop(close))
         k_close_l = []
         for i in k_close_p:
-            k_close_l.append(point[1])
+            k_close_l.append(i[1])
         return self.get_top_label(k_close_l)
