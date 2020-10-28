@@ -6,7 +6,7 @@
 
 import math
 import heapq
-import numpy
+# import numpy
 
 # unique takes an iterable and returns
 # - a set of each unique item from that iterable
@@ -226,15 +226,15 @@ class KNN_Classifier:
     ##################################################
     # Objective: Return the euclidean distance distance between two points
     def calc_euclidean_distance(self, point_a, point_b):
-        # x = point_a
-        # y = point_b
-        # distance = math.sqrt(sum([(a - b) ** 2 for a, b in zip(x, y)]))
-        # return distance
-        a = sum(point_a)
-        b = sum(point_b)
-        nump = a - b
-        nump = nump ** 2
-        return numpy.sum(math.sqrt(nump))
+        x = point_a
+        y = point_b
+        distance = math.sqrt(sum([(a - b) ** 2 for a, b in zip(x, y)]))
+        return distance
+        # a = sum(point_a)
+        # b = sum(point_b)
+        # nump = a - b
+        # nump = nump ** 2
+        # return numpy.sum(math.sqrt(nump))
 
     ##################################################
     # Problem 3b - Pick Label
